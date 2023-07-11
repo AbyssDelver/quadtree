@@ -1,3 +1,6 @@
+#ifndef QUADTREE_HPP
+#define QUADTREE_HPP
+
 #include "point.hpp"
 #include <iostream> 
 struct Rectangle {
@@ -132,3 +135,4 @@ class Quad_tree{
   }
 
 };
+#endif
