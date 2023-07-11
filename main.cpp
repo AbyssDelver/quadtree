@@ -12,6 +12,7 @@ constexpr double window_width{1500.};
 constexpr double window_height{1500.};
 constexpr int tree_capacity{5};
 constexpr int point_number{100};
+constexpr double radius{15.};
 }
 //###########################
 
@@ -23,9 +24,16 @@ double gaussian(double a, double b) {
   return unif(eng);
 }
 
-void draw_point(sf::RenderWindow &window, Point& point){
-  sf::CircleShape shape(10);
-  shape.setFillColor(sf::Color::Blue);
+void draw_point(sf::RenderWindow &window, Point& point, bool is_collided){
+  sf::CircleShape shape(3.*constants::radius/4.);
+  if(is_collided){
+  shape.setFillColor(sf::Color::Green);
+  }
+  else{
+  shape.setFillColor(sf::Color::Red);
+  }
+  shape.setOutlineThickness(constants::radius/4.);
+  shape.setOutlineColor(sf::Color::Yellow);
   shape.setPosition(point.x(), point.y());
   window.draw(shape);
 }
@@ -40,9 +48,10 @@ for(int i = 0; i < constants::point_number; ++i){
 }
 
 for(auto& point : point_vector){
-  //WTF IS HAPPENING HERE, WHY DO ALL THE VARIABLES INSIDE TREE MEMBER POINTS CHANGE HERE?????
   tree.insert(&point);
 }
+
+std::vector<Point*> in_range;
 
 sf::RenderWindow window;
   window.create(sf::VideoMode(constants::window_width, constants::window_height), "boids!", sf::Style::Default);
@@ -57,8 +66,17 @@ sf::RenderWindow window;
     // makes the window return black
     window.clear(sf::Color::Black);
     
+    
     for(auto point : point_vector){
-      draw_point(window, point);
+      tree.query(constants::radius, point, in_range);
+      //greater than one, because itself will always be in range
+      if(in_range.size() > 1){
+      draw_point(window, point, true);
+      }
+      else{
+      draw_point(window, point, false);
+      }
+      in_range.clear();
     }
 
     tree.display(window);
